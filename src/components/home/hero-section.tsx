@@ -2,73 +2,113 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
-
+import { ArrowRight, Shield, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function HeroSection() {
     return (
-        <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-background">
-            {/* Background Gradient Mesh */}
-            <div className="absolute inset-0 z-0 opacity-20 dark:opacity-10 pointer-events-none">
-                <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/40 rounded-full blur-[128px] animate-pulse" />
-                <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-yellow-500/30 rounded-full blur-[128px] animate-pulse delay-1000" />
-            </div>
+        <section className="relative min-h-[95vh] flex items-center justify-center overflow-hidden bg-background">
+            {/* Floating Gradient Orbs */}
+            <div className="orb orb-gold w-[500px] h-[500px] top-[10%] left-[15%]" />
+            <div className="orb orb-cyan w-[400px] h-[400px] top-[20%] right-[10%]" />
+            <div className="orb orb-violet w-[350px] h-[350px] bottom-[15%] left-[40%]" />
+            <div className="orb orb-gold w-[250px] h-[250px] bottom-[30%] right-[25%] delay-1000" />
 
+            {/* Retro Grid Floor */}
+            <div className="retro-grid" />
+
+            {/* Radial Vignette Overlay */}
+            <div className="absolute inset-0 z-[1] bg-[radial-gradient(ellipse_at_center,transparent_20%,hsl(var(--background))_80%)]" />
+
+            {/* Content */}
             <div className="container relative z-10 px-4 md:px-6 flex flex-col items-center text-center">
+                {/* Badge */}
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                    className="inline-flex items-center rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-sm font-medium text-primary mb-6"
+                    initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
+                    className="inline-flex items-center gap-2 rounded-full border border-primary/20 glass px-4 py-2 text-sm font-medium text-primary mb-8"
                 >
-                    <span className="flex h-2 w-2 rounded-full bg-primary mr-2 animate-pulse"></span>
-                    The Future of P2P Trading is Here
+                    <Sparkles className="h-4 w-4 animate-pulse" />
+                    <span>The Future of P2P Trading is Here</span>
+                    <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse" />
                 </motion.div>
 
+                {/* Main Headline */}
                 <motion.h1
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.2 }}
-                    className="font-serif text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight text-foreground mb-6 max-w-4xl"
+                    transition={{ duration: 0.7, delay: 0.15, ease: "easeOut" }}
+                    className="font-serif text-5xl md:text-7xl lg:text-[5.5rem] font-bold tracking-tight text-foreground mb-6 max-w-5xl leading-[1.1]"
                 >
-                    Trade Crypto with <br />
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 via-yellow-400 to-yellow-600 animate-gradient-x">
+                    Trade Crypto with{" "}
+                    <span className="text-gradient-gold">
                         Absolute Confidence
                     </span>
                 </motion.h1>
 
+                {/* Subhead */}
                 <motion.p
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.4 }}
-                    className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl leading-relaxed"
+                    transition={{ duration: 0.7, delay: 0.3, ease: "easeOut" }}
+                    className="text-lg md:text-xl text-muted-foreground mb-12 max-w-2xl leading-relaxed"
                 >
-                    Experience the most secure, luxurious, and efficient peer-to-peer cryptocurrency marketplace.
-                    Escrow protection, instant settlements, and premium support.
+                    Experience the most secure, luxurious, and efficient peer-to-peer
+                    cryptocurrency marketplace. Escrow protection, instant settlements,
+                    and premium support&mdash;all in one platform.
                 </motion.p>
 
+                {/* CTA Buttons */}
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.6 }}
+                    transition={{ duration: 0.7, delay: 0.45, ease: "easeOut" }}
                     className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto"
                 >
                     <Link href="/register">
-                        <Button size="lg" variant="gold" className="w-full sm:w-auto text-base px-8 h-12">
-                            Get Started Now <ArrowRight className="ml-2 h-4 w-4" />
+                        <Button
+                            size="lg"
+                            variant="gold"
+                            className="w-full sm:w-auto text-base px-10 h-14 rounded-2xl shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all duration-300 hover:scale-105 active:scale-95"
+                        >
+                            Get Started Free <ArrowRight className="ml-2 h-5 w-5" />
                         </Button>
                     </Link>
                     <Link href="/offers">
-                        <Button size="lg" variant="outline" className="w-full sm:w-auto text-base px-8 h-12 border-primary/20 hover:bg-primary/5">
-                            Browse Offers
+                        <Button
+                            size="lg"
+                            variant="outline"
+                            className="w-full sm:w-auto text-base px-10 h-14 rounded-2xl border-primary/20 hover:bg-primary/5 glass transition-all duration-300 hover:scale-105 active:scale-95"
+                        >
+                            <Shield className="mr-2 h-4 w-4" /> Browse Offers
                         </Button>
                     </Link>
                 </motion.div>
-            </div>
 
-            {/* Decorative Grid */}
-            <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
+                {/* Trust Indicators */}
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 1, delay: 0.8 }}
+                    className="flex items-center gap-6 mt-12 text-xs text-muted-foreground"
+                >
+                    <div className="flex items-center gap-1.5">
+                        <div className="h-2 w-2 rounded-full bg-green-500" />
+                        <span>Escrow Protected</span>
+                    </div>
+                    <div className="h-4 w-px bg-border" />
+                    <div className="flex items-center gap-1.5">
+                        <div className="h-2 w-2 rounded-full bg-blue-500" />
+                        <span>150+ Countries</span>
+                    </div>
+                    <div className="h-4 w-px bg-border" />
+                    <div className="flex items-center gap-1.5">
+                        <div className="h-2 w-2 rounded-full bg-primary" />
+                        <span>24/7 Support</span>
+                    </div>
+                </motion.div>
+            </div>
         </section>
     );
 }

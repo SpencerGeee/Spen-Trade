@@ -63,9 +63,9 @@
   }
 }
 
-/*
-  ---break---
-*/
+/* ═══════════════════════════════════════
+   COLOR SYSTEM — Premium Gold & Dark
+   ═══════════════════════════════════════ */
 
 :root {
   --background: 0 0% 100%;
@@ -75,7 +75,6 @@
   --popover: 0 0% 100%;
   --popover-foreground: 222.2 84% 4.9%;
   --primary: 37 30% 40%;
-  /* Gold #856d47 */
   --primary-foreground: 210 40% 98%;
   --secondary: 210 40% 96.1%;
   --secondary-foreground: 222.2 47.4% 11.2%;
@@ -89,6 +88,10 @@
   --input: 214.3 31.8% 91.4%;
   --ring: 37 30% 40%;
   --radius: 0.5rem;
+  /* Neon accents */
+  --neon-cyan: 180 100% 50%;
+  --neon-violet: 270 90% 60%;
+  --gold-glow: 37 80% 55%;
 }
 
 .dark {
@@ -99,7 +102,6 @@
   --popover: 222.2 84% 4.9%;
   --popover-foreground: 210 40% 98%;
   --primary: 37 30% 40%;
-  /* Gold #856d47 */
   --primary-foreground: 222.2 47.4% 11.2%;
   --secondary: 217.2 32.6% 17.5%;
   --secondary-foreground: 210 40% 98%;
@@ -112,8 +114,11 @@
   --border: 217.2 32.6% 17.5%;
   --input: 217.2 32.6% 17.5%;
   --ring: 37 30% 40%;
-  /* Gold ring */
 }
+
+/* ═══════════════════════════════════════
+   BASE LAYER
+   ═══════════════════════════════════════ */
 
 @layer base {
   * {
@@ -127,4 +132,237 @@
   .container {
     @apply mx-auto px-4 md:px-6 lg:px-8 max-w-7xl w-full;
   }
+}
+
+/* ═══════════════════════════════════════
+   KEYFRAME ANIMATIONS — Premium UX
+   ═══════════════════════════════════════ */
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0px) scale(1);
+  }
+
+  50% {
+    transform: translateY(-30px) scale(1.05);
+  }
+}
+
+@keyframes float-reverse {
+
+  0%,
+  100% {
+    transform: translateY(0px) scale(1);
+  }
+
+  50% {
+    transform: translateY(20px) scale(0.95);
+  }
+}
+
+@keyframes glow-pulse {
+
+  0%,
+  100% {
+    opacity: 0.4;
+    filter: blur(60px);
+  }
+
+  50% {
+    opacity: 0.8;
+    filter: blur(80px);
+  }
+}
+
+@keyframes gradient-x {
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes border-glow {
+
+  0%,
+  100% {
+    border-color: rgba(133, 109, 71, 0.2);
+  }
+
+  50% {
+    border-color: rgba(133, 109, 71, 0.6);
+  }
+}
+
+@keyframes count-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ═══════════════════════════════════════
+   UTILITY CLASSES — Glassmorphism & FX
+   ═══════════════════════════════════════ */
+
+/* Glassmorphism 2.0 */
+.glass {
+  background: rgba(255, 255, 255, 0.03);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-strong {
+  background: rgba(255, 255, 255, 0.06);
+  -webkit-backdrop-filter: blur(40px);
+  backdrop-filter: blur(40px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Glow border on hover */
+.glow-border {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.glow-border::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(133, 109, 71, 0), rgba(133, 109, 71, 0));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  transition: background 0.5s ease;
+  pointer-events: none;
+}
+
+.glow-border:hover::before {
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--neon-cyan)), hsl(var(--primary)));
+}
+
+.glow-border:hover {
+  box-shadow: 0 0 30px rgba(133, 109, 71, 0.15), 0 0 60px rgba(133, 109, 71, 0.05);
+}
+
+/* Text gradient */
+.text-gradient-gold {
+  background: linear-gradient(135deg, #c9a84c, #856d47, #e8c86e, #856d47);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-x 6s ease infinite;
+}
+
+.text-gradient-neon {
+  background: linear-gradient(135deg, hsl(var(--neon-cyan)), hsl(var(--neon-violet)), hsl(var(--neon-cyan)));
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-x 4s ease infinite;
+}
+
+/* Floating orb styles */
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.orb-gold {
+  background: radial-gradient(circle, rgba(201, 168, 76, 0.4), transparent 70%);
+  animation: float 8s ease-in-out infinite, glow-pulse 4s ease-in-out infinite;
+}
+
+.orb-cyan {
+  background: radial-gradient(circle, rgba(0, 255, 255, 0.15), transparent 70%);
+  animation: float-reverse 10s ease-in-out infinite, glow-pulse 5s ease-in-out infinite;
+}
+
+.orb-violet {
+  background: radial-gradient(circle, rgba(138, 43, 226, 0.15), transparent 70%);
+  animation: float 12s ease-in-out infinite, glow-pulse 6s ease-in-out infinite;
+}
+
+/* Retro Grid */
+.retro-grid {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background-image:
+    linear-gradient(rgba(133, 109, 71, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(133, 109, 71, 0.1) 1px, transparent 1px);
+  background-size: 60px 60px;
+  transform: perspective(500px) rotateX(60deg);
+  transform-origin: bottom;
+  -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.4), transparent 80%);
+  mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.4), transparent 80%);
+}
+
+/* Marquee */
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 40s linear infinite;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+/* Shimmer loading effect */
+.shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2s ease-in-out infinite;
 }

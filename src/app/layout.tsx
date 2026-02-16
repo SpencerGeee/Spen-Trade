@@ -6,6 +6,8 @@ import { cn } from "@/lib/utils";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { ClerkProvider } from "@clerk/nextjs";
+import QueryProvider from "@/providers/QueryProvider";
+import { Web3ModalProvider } from "@/context/Web3Modal";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -29,26 +31,30 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
-      <html lang="en" suppressHydrationWarning>
-        <body
-          className={cn(
-            "min-h-screen bg-background font-sans antialiased flex flex-col",
-            playfair.variable,
-            jost.variable
-          )}
-        >
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="dark"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <Navbar />
-            <main className="flex-1 flex flex-col">{children}</main>
-            <Footer />
-          </ThemeProvider>
-        </body>
-      </html>
+      <Web3ModalProvider>
+        <QueryProvider>
+          <html lang="en" suppressHydrationWarning>
+            <body
+              className={cn(
+                "min-h-screen bg-background font-sans antialiased flex flex-col",
+                playfair.variable,
+                jost.variable
+              )}
+            >
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="dark"
+                enableSystem
+                disableTransitionOnChange
+              >
+                <Navbar />
+                <main className="flex-1 flex flex-col">{children}</main>
+                <Footer />
+              </ThemeProvider>
+            </body>
+          </html>
+        </QueryProvider>
+      </Web3ModalProvider>
     </ClerkProvider>
   );
 }

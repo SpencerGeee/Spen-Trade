@@ -1,0 +1,159 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+  MODERATOR
+}
+
+enum KycStatus {
+  NOT_STARTED
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum OfferType {
+  BUY
+  SELL
+}
+
+enum TradeStatus {
+  PENDING
+  ESCROW_LOCKED
+  PAID
+  DISPUTE
+  COMPLETED
+  CANCELLED
+}
+
+enum TxType {
+  DEPOSIT
+  WITHDRAWAL
+  TRADE
+  FEE
+}
+
+enum TxStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+model User {
+  id        String   @id @default(cuid())
+  clerkId   String   @unique
+  email     String   @unique
+  username  String?  @unique
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  kycStatus KycStatus @default(NOT_STARTED)
+  
+  kyc       Kyc?
+  wallet    Wallet?
+  offers    Offer[]
+  tradesAsBuyer  Trade[] @relation("BuyerTrades")
+  tradesAsSeller Trade[] @relation("SellerTrades")
+  transactions   Transaction[]
+}
+
+model Kyc {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  firstName String
+  lastName  String
+  dob       DateTime
+  country   String
+  documentType String
+  documentUrl  String
+  status    KycStatus @default(PENDING)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Wallet {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  address   String   @unique // EVM address generated for user
+  privateKey String? // Encrypted private key (managed custodially for seamless UX)
+  balance   Decimal  @default(0) // Internal ledger balance
+  currency  String   @default("USD")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Offer {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  type        OfferType
+  cryptocurrency String // ETH, BTC, USDT
+  fiatCurrency   String // GHS, USD, NGN
+  priceType      String // FIXED, MARKET
+  priceMargin    Decimal?
+  fixedPrice     Decimal?
+  minAmount      Decimal
+  maxAmount      Decimal
+  paymentMethod  String // BANK_TRANSFER, MOMO, GIFTCARD
+  terms          String?
+  isActive       Boolean @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  trades         Trade[]
+}
+
+model Trade {
+  id          String   @id @default(cuid())
+  offerId     String
+  offer       Offer    @relation(fields: [offerId], references: [id])
+  buyerId     String
+  buyer       User     @relation("BuyerTrades", fields: [buyerId], references: [id])
+  sellerId    String
+  seller      User     @relation("SellerTrades", fields: [sellerId], references: [id])
+  amountFiat  Decimal
+  amountCrypto Decimal
+  fee         Decimal
+  status      TradeStatus @default(PENDING)
+  escrowAddress String? // Smart contract address if on-chain
+  txHash      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  messages    TradeMessage[]
+}
+
+model TradeMessage {
+  id        String   @id @default(cuid())
+  tradeId   String
+  trade     Trade    @relation(fields: [tradeId], references: [id])
+  senderId  String
+  content   String
+  createdAt DateTime @default(now())
+}
+
+model Transaction {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  type      TxType
+  status    TxStatus @default(PENDING)
+  amount    Decimal
+  currency  String
+  txHash    String? // On-chain tx hash
+  metadata  Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
