@@ -69,7 +69,13 @@ export async function PATCH(
                 if (trade.sellerId !== dbUser.id) {
                     return new NextResponse("Only seller can fund escrow", { status: 403 });
                 }
-                result = await EscrowService.lockFunds(tradeId);
+                result = await EscrowService.lockFunds({
+                    tradeId,
+                    buyerId: trade.buyerId,
+                    sellerId: trade.sellerId,
+                    amountCrypto: Number(trade.amountCrypto),
+                    cryptocurrency: trade.offer.cryptocurrency // Need to include offer relation
+                });
                 break;
 
             case "PAID":

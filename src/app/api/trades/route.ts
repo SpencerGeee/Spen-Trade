@@ -54,7 +54,13 @@ export async function POST(req: Request) {
         });
 
         // Lazily lock funds (enterprise-grade UX)
-        await EscrowService.lockFunds(trade.id);
+        await EscrowService.lockFunds({
+            tradeId: trade.id,
+            buyerId,
+            sellerId,
+            amountCrypto: Number(amountCrypto),
+            cryptocurrency: offer.cryptocurrency,
+        });
 
         return NextResponse.json(trade);
     } catch (error) {

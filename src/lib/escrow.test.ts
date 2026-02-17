@@ -5,6 +5,7 @@ jest.mock("@/lib/prisma", () => ({
     prisma: {
         trade: {
             update: jest.fn(),
+            findUnique: jest.fn(),
         },
     },
 }));
@@ -23,9 +24,16 @@ describe("EscrowService", () => {
 
     describe("lockFunds", () => {
         it("should update trade status to ESCROW_LOCKED", async () => {
+            (prisma.trade.findUnique as jest.Mock).mockResolvedValue({ id: "t_1" });
             (prisma.trade.update as jest.Mock).mockResolvedValue({ id: "t_1", status: "ESCROW_LOCKED" });
 
-            const result = await EscrowService.lockFunds("t_1");
+            const result = await EscrowService.lockFunds({
+                tradeId: "t_1",
+                buyerId: "buyer_1",
+                sellerId: "seller_1",
+                amountCrypto: 100,
+                cryptocurrency: "USDT"
+            });
 
             expect(result.status).toBe("ESCROW_LOCKED");
             expect(prisma.trade.update).toHaveBeenCalledWith({

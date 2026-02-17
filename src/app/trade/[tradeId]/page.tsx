@@ -19,6 +19,7 @@ import {
     Lock,
     Loader2,
 } from "lucide-react";
+import { pusherClient } from "@/lib/pusher";
 
 interface TradePageProps {
     params: Promise<{ tradeId: string }>;
@@ -95,12 +96,23 @@ export default function TradePage({ params }: TradePageProps) {
         },
     });
 
-    // Auto-scroll chat
+    // Auto-scroll chat & Pusher subscription
     useEffect(() => {
         if (scrollRef.current) {
             scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
         }
-    }, [messages]);
+
+        const channel = pusherClient.subscribe(`trade-${tradeId}`);
+        channel.bind("new-message", (newMessage: any) => {
+            queryClient.setQueryData(["trade-messages", tradeId], (old: any[]) => {
+                return [...(old || []), newMessage];
+            });
+        });
+
+        return () => {
+            pusherClient.unsubscribe(`trade-${tradeId}`);
+        };
+    }, [tradeId, queryClient, messages]);
 
     if (isLoading) {
         return (
@@ -282,8 +294,8 @@ export default function TradePage({ params }: TradePageProps) {
                                 >
                                     <div
                                         className={`max-w-[70%] rounded-2xl px-4 py-2 ${msg.senderId === user?.id
-                                                ? "bg-primary text-primary-foreground rounded-br-sm"
-                                                : "glass rounded-bl-sm"
+                                            ? "bg-primary text-primary-foreground rounded-br-sm"
+                                            : "glass rounded-bl-sm"
                                             }`}
                                     >
                                         <p className="text-sm">{msg.content}</p>

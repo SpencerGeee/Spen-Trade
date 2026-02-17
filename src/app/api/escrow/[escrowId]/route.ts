@@ -24,7 +24,7 @@ export async function PATCH(
                 result = await EscrowService.refundFunds(escrowId);
                 break;
             case "DISPUTE":
-                result = await EscrowService.disputeEscrow(escrowId);
+                result = await EscrowService.disputeTrade(escrowId);
                 break;
             default:
                 return new NextResponse("Invalid action. Use RELEASE, REFUND, or DISPUTE", { status: 400 });
@@ -47,7 +47,7 @@ export async function GET(
         if (!userId) return new NextResponse("Unauthorized", { status: 401 });
 
         const { escrowId } = await params;
-        const escrow = await EscrowService.getStatus(escrowId);
+        const escrow = await EscrowService.getByTradeId(escrowId);
 
         if (!escrow) return new NextResponse("Escrow not found", { status: 404 });
 

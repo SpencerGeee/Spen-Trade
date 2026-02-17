@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { pusherServer } from "@/lib/pusher";
 
 // GET: Fetch messages for a trade
 export async function GET(
@@ -72,6 +73,8 @@ export async function POST(
                 content: content.trim(),
             },
         });
+
+        await pusherServer.trigger(`trade-${tradeId}`, "new-message", message);
 
         return NextResponse.json(message);
     } catch (error) {
