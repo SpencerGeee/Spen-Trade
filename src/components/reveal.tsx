@@ -21,59 +21,38 @@ export const Reveal = ({
     className,
 }: RevealProps) => {
     const ref = useRef(null);
-    const isInView = useInView(ref, { once: true });
+    const isInView = useInView(ref, { once: true, margin: "-100px" });
     const mainControls = useAnimation();
-    const slideControls = useAnimation();
 
     useEffect(() => {
         if (isInView) {
             mainControls.start("visible");
-            slideControls.start("visible");
         }
-    }, [isInView, mainControls, slideControls]);
+    }, [isInView, mainControls]);
 
-    const getVariants = (dir: string) => {
-        switch (dir) {
-            case "down":
-                return { hidden: { opacity: 0, y: -75 }, visible: { opacity: 1, y: 0 } };
-            case "left":
-                return { hidden: { opacity: 0, x: -75 }, visible: { opacity: 1, x: 0 } };
-            case "right":
-                return { hidden: { opacity: 0, x: 75 }, visible: { opacity: 1, x: 0 } };
-            case "up":
-            default:
-                return { hidden: { opacity: 0, y: 75 }, visible: { opacity: 1, y: 0 } };
+    const variants = {
+        hidden: {
+            opacity: 0,
+            y: direction === "up" ? 40 : direction === "down" ? -40 : 0,
+            x: direction === "left" ? -40 : direction === "right" ? 40 : 0
+        },
+        visible: {
+            opacity: 1,
+            y: 0,
+            x: 0
         }
     };
 
     return (
-        <div ref={ref} style={{ position: "relative", width, overflow: "hidden" }} className={className}>
+        <div ref={ref} style={{ position: "relative", width }} className={className}>
             <motion.div
-                variants={getVariants(direction) as { hidden: Variant; visible: Variant }}
+                variants={variants}
                 initial="hidden"
                 animate={mainControls}
-                transition={{ duration, delay }}
+                transition={{ duration, delay, ease: "easeOut" }}
             >
                 {children}
             </motion.div>
-            <motion.div
-                variants={{
-                    hidden: { left: 0 },
-                    visible: { left: "100%" },
-                }}
-                initial="hidden"
-                animate={slideControls}
-                transition={{ duration: 0.5, ease: "easeIn" }}
-                style={{
-                    position: "absolute",
-                    top: 4,
-                    bottom: 4,
-                    left: 0,
-                    right: 0,
-                    background: "hsl(var(--primary))",
-                    zIndex: 20,
-                }}
-            />
         </div>
     );
 };

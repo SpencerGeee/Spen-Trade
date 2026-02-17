@@ -67,9 +67,9 @@ const itemVariants = {
     show: { opacity: 1, y: 0 },
 };
 
-export function FeaturesSection() {
+export default function FeaturesSection() {
     return (
-        <section className="py-28 bg-background relative overflow-hidden">
+        <section className="py-28 bg-background relative overflow-hidden gpu">
             {/* Subtle background glow */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
 

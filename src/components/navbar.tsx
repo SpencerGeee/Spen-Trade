@@ -65,6 +65,10 @@ export function Navbar() {
                             <Link href="/dashboard">
                                 <Button variant="ghost">Dashboard</Button>
                             </Link>
+                            {/* Admin Link Placeholder - Real check would look at user metadata or DB role */}
+                            <Link href="/admin">
+                                <Button variant="ghost" className="text-primary hover:text-primary hover:bg-primary/10 font-bold border border-primary/20">Admin</Button>
+                            </Link>
                             <UserButton afterSignOutUrl="/" />
                         </SignedIn>
                     </div>

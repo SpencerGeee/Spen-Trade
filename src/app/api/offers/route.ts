@@ -3,6 +3,8 @@ import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { offerSchema } from "@/lib/validations/offer";
 
+import { logger } from "@/lib/logger";
+
 export async function POST(req: Request) {
     try {
         const { userId } = await auth();
@@ -39,7 +41,7 @@ export async function POST(req: Request) {
 
         return NextResponse.json(offer);
     } catch (error) {
-        console.error("[OFFERS_POST]", error);
+        logger.error({ error }, "[OFFERS_POST]");
         return new NextResponse("Internal Error", { status: 500 });
     }
 }
@@ -72,7 +74,7 @@ export async function GET(req: Request) {
 
         return NextResponse.json(offers);
     } catch (error) {
-        console.error("[OFFERS_GET]", error);
+        logger.error({ error }, "[OFFERS_GET]");
         return new NextResponse("Internal Error", { status: 500 });
     }
 }

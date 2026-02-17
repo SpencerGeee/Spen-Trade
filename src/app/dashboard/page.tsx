@@ -4,48 +4,69 @@ import { useUser } from "@clerk/nextjs";
 import { Reveal } from "@/components/reveal";
 import {
     TrendingUp,
-    ArrowUpRight,
-    ArrowDownRight,
     CreditCard,
     ShieldCheck,
-    Zap
+    Zap,
+    Wallet,
+    Loader2
 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { cn } from "@/lib/utils";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
-const stats = [
-    {
-        title: "Total Balance",
-        value: "$12,450.00",
-        change: "+12.5%",
-        trend: "up",
-        icon: Wallet,
-    },
-    {
-        title: "Active Offers",
-        value: "2",
-        change: "BTC & ETH",
-        trend: "neutral",
-        icon: CreditCard,
-    },
-    {
-        title: "Security Score",
-        value: "98%",
-        change: "Excellent",
-        trend: "up",
-        icon: ShieldCheck,
-    },
-    {
-        title: "Trade Limit",
-        value: "$50K",
-        change: "Basic Tier",
-        trend: "up",
-        icon: Zap,
-    },
-];
-
-import { Wallet } from "lucide-react";
+// stats constant removed - now dynamic
 
 export default function DashboardPage() {
-    const { isLoaded, isSignedIn, user } = useUser();
+    const { user } = useUser();
+
+    const { data, isLoading } = useQuery({
+        queryKey: ["user-stats"],
+        queryFn: async () => {
+            const res = await fetch("/api/user/stats");
+            if (!res.ok) throw new Error("Failed to fetch stats");
+            return res.json();
+        },
+    });
+
+    if (isLoading) {
+        return (
+            <div className="flex h-[60vh] items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        );
+    }
+
+    const statsCards = [
+        {
+            title: "Total Balance",
+            value: data?.stats.totalBalance || "$0.00",
+            change: "Live Balance",
+            trend: "up",
+            icon: Wallet,
+        },
+        {
+            title: "Active Trades",
+            value: data?.stats.activeTrades || "0",
+            change: "Open P2P Trades",
+            trend: "neutral",
+            icon: CreditCard,
+        },
+        {
+            title: "Security Score",
+            value: data?.stats.securityScore || "40%",
+            change: data?.profile.kycStatus === "APPROVED" ? "Excellent" : "Verify to improve",
+            trend: data?.profile.kycStatus === "APPROVED" ? "up" : "neutral",
+            icon: ShieldCheck,
+        },
+        {
+            title: "Trade Limit",
+            value: data?.stats.tradeLimit || "$1K",
+            change: data?.stats.tier || "Basic Tier",
+            trend: "up",
+            icon: Zap,
+        },
+    ];
 
     return (
         <div className="space-y-8">
@@ -60,7 +81,7 @@ export default function DashboardPage() {
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {stats.map((stat, index) => (
+                {statsCards.map((stat, index) => (
                     <Reveal key={index} direction="up" delay={0.1 * index} width="100%">
                         <div className="p-6 rounded-2xl border bg-secondary/20 backdrop-blur-sm border-primary/10 hover:border-primary/30 transition-all group overflow-hidden relative">
                             <div className="absolute -right-2 -top-2 opacity-5 group-hover:opacity-10 transition-opacity">
@@ -112,20 +133,27 @@ export default function DashboardPage() {
 
                         <div className="space-y-4 mt-auto">
                             <div className="flex items-center justify-between text-sm">
-                                <span>Email Verified</span>
-                                <span className="text-green-500">Done</span>
+                                <span>Clerk Auth</span>
+                                <span className="text-green-500">Secure</span>
                             </div>
                             <div className="flex items-center justify-between text-sm">
-                                <span>Identity Verification</span>
-                                <span className="text-yellow-500">In Progress</span>
+                                <span>KYC Verification</span>
+                                <span className={cn(
+                                    "font-medium",
+                                    data?.profile.kycStatus === "APPROVED" ? "text-green-500" : "text-yellow-500"
+                                )}>
+                                    {data?.profile.kycStatus}
+                                </span>
                             </div>
                             <div className="flex items-center justify-between text-sm border-t pt-4">
                                 <span>Withdrawal Limits</span>
-                                <span className="font-bold">$10,000 / day</span>
+                                <span className="font-bold">{data?.stats.tradeLimit} / day</span>
                             </div>
-                            <button className="w-full mt-4 bg-primary text-primary-foreground py-2 rounded-lg font-medium hover:opacity-90 transition-opacity">
-                                Verify Now
-                            </button>
+                            <Link href="/dashboard/kyc" className="w-full mt-4">
+                                <Button className="w-full">
+                                    {data?.profile.kycStatus === "APPROVED" ? "View Profile" : "Verify Now"}
+                                </Button>
+                            </Link>
                         </div>
                     </div>
                 </Reveal>
@@ -134,5 +162,4 @@ export default function DashboardPage() {
     );
 }
 
-// Utility for page.tsx
-import { cn } from "@/lib/utils";
+// Utility for page.tsx removed as it's imported at the top

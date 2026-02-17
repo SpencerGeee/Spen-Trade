@@ -17,7 +17,7 @@ const partners = [
     "MetaMask", "WalletConnect", "Coinbase", "Binance", "Tether",
 ];
 
-export function TrustSection() {
+export default function TrustSection() {
     return (
         <section className="py-24 relative overflow-hidden">
             <div className="container px-4 md:px-6">

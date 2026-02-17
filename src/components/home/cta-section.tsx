@@ -5,15 +5,10 @@ import { motion } from "framer-motion";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export function CTASection() {
+export default function CTASection() {
     return (
         <section className="py-32 relative overflow-hidden">
-            {/* Ambient glow layers */}
-            <div className="absolute inset-0 -z-10">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-primary/15 blur-[150px] rounded-full" />
-                <div className="absolute bottom-0 left-1/4 w-[400px] h-[300px] bg-cyan-500/10 blur-[120px] rounded-full" />
-                <div className="absolute bottom-0 right-1/4 w-[400px] h-[300px] bg-violet-500/10 blur-[120px] rounded-full" />
-            </div>
+            <div className="absolute inset-0 -z-10 bg-[#0a0a0f]" />
 
             <div className="container px-4 md:px-6 relative z-10">
                 <motion.div

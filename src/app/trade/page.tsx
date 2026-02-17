@@ -1,6 +1,6 @@
 "use client";
 
-import { TradeWidget } from "@/components/home/trade-widget";
+import TradeWidget from "@/components/home/trade-widget";
 import { Reveal } from "@/components/reveal";
 import { Shield, Zap, RefreshCw } from "lucide-react";
 

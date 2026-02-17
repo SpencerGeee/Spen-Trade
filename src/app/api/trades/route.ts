@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { logger } from "@/lib/logger";
+import { EscrowService } from "@/lib/escrow";
 
 // POST: Initiate a new trade from an offer
 export async function POST(req: Request) {
@@ -51,9 +53,12 @@ export async function POST(req: Request) {
             },
         });
 
+        // Lazily lock funds (enterprise-grade UX)
+        await EscrowService.lockFunds(trade.id);
+
         return NextResponse.json(trade);
     } catch (error) {
-        console.error("[TRADES_POST]", error);
+        logger.error({ error }, "[TRADES_POST]");
         return new NextResponse("Internal Error", { status: 500 });
     }
 }

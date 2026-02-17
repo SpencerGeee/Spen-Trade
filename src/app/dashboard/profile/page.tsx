@@ -3,22 +3,32 @@
 import { GlassCard } from "@/components/ui/glass-card";
 import { ShinyButton } from "@/components/ui/shiny-button";
 import { useUser } from "@clerk/nextjs";
-import { BadgeCheck, ShieldAlert, User as UserIcon, Wallet } from "lucide-react";
+import { BadgeCheck, ShieldAlert, User as UserIcon, Wallet, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
 
 export default function ProfilePage() {
     const { user, isLoaded } = useUser();
 
-    if (!isLoaded) {
+    // Fetch account stats & KYC from DB
+    const { data, isLoading: statsLoading } = useQuery({
+        queryKey: ["user-stats"],
+        queryFn: async () => {
+            const res = await fetch("/api/user/stats");
+            if (!res.ok) throw new Error("Failed to fetch stats");
+            return res.json();
+        },
+    });
+
+    if (!isLoaded || statsLoading) {
         return (
             <div className="flex h-screen items-center justify-center">
-                <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
         );
     }
 
-    // Mock KYC status for now - will fetch from DB later
-    const kycStatus: string = "PENDING"; // NOT_STARTED, PENDING, APPROVED, REJECTED
+    const kycStatus = data?.profile.kycStatus || "PENDING";
 
     return (
         <div className="container mx-auto space-y-8 py-8">
@@ -56,7 +66,7 @@ export default function ProfilePage() {
                                     Member since {user?.createdAt ? new Date(user.createdAt).getFullYear() : '2026'}
                                 </span>
                                 <span className="rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground">
-                                    Level 1 Trader
+                                    {kycStatus === "APPROVED" ? "Level 2 Trader" : "Level 1 Trader"}
                                 </span>
                             </div>
                         </div>
@@ -99,7 +109,7 @@ export default function ProfilePage() {
 
                         <Link href="/dashboard/kyc" className="w-full">
                             <ShinyButton className="w-full">
-                                {kycStatus === "NOT_STARTED" ? "Start Verification" : "Continue Verification"}
+                                {kycStatus === "NOT_STARTED" ? "Start Verification" : kycStatus === "APPROVED" ? "Verification Done" : "Continue Verification"}
                             </ShinyButton>
                         </Link>
                     </div>

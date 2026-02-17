@@ -7,12 +7,12 @@ import { Button } from "@/components/ui/button";
 
 export function HeroSection() {
     return (
-        <section className="relative min-h-[95vh] flex items-center justify-center overflow-hidden bg-background">
-            {/* Floating Gradient Orbs */}
-            <div className="orb orb-gold w-[500px] h-[500px] top-[10%] left-[15%]" />
-            <div className="orb orb-cyan w-[400px] h-[400px] top-[20%] right-[10%]" />
-            <div className="orb orb-violet w-[350px] h-[350px] bottom-[15%] left-[40%]" />
-            <div className="orb orb-gold w-[250px] h-[250px] bottom-[30%] right-[25%] delay-1000" />
+        <section className="relative min-h-[95vh] flex items-center justify-center overflow-hidden bg-background gpu">
+            {/* Floating Gradient Orbs Container */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="orb orb-gold w-[500px] h-[500px] top-[10%] left-[15%]" />
+                <div className="orb orb-cyan w-[400px] h-[400px] top-[20%] right-[10%]" />
+            </div>
 
             {/* Retro Grid Floor */}
             <div className="retro-grid" />
@@ -23,16 +23,13 @@ export function HeroSection() {
             {/* Content */}
             <div className="container relative z-10 px-4 md:px-6 flex flex-col items-center text-center">
                 {/* Badge */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20, scale: 0.9 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    transition={{ duration: 0.6, ease: "easeOut" }}
+                <div
                     className="inline-flex items-center gap-2 rounded-full border border-primary/20 glass px-4 py-2 text-sm font-medium text-primary mb-8"
                 >
-                    <Sparkles className="h-4 w-4 animate-pulse" />
+                    <Sparkles className="h-4 w-4" />
                     <span>The Future of P2P Trading is Here</span>
-                    <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-                </motion.div>
+                    <span className="flex h-2 w-2 rounded-full bg-green-500" />
+                </div>
 
                 {/* Main Headline */}
                 <motion.h1
@@ -70,7 +67,7 @@ export function HeroSection() {
                         <Button
                             size="lg"
                             variant="gold"
-                            className="w-full sm:w-auto text-base px-10 h-14 rounded-2xl shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all duration-300 hover:scale-105 active:scale-95"
+                            className="w-full sm:w-auto text-base px-10 h-14 rounded-2xl shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all duration-300 hover:scale-105 active:scale-95 gpu"
                         >
                             Get Started Free <ArrowRight className="ml-2 h-5 w-5" />
                         </Button>
@@ -87,10 +84,7 @@ export function HeroSection() {
                 </motion.div>
 
                 {/* Trust Indicators */}
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 1, delay: 0.8 }}
+                <div
                     className="flex items-center gap-6 mt-12 text-xs text-muted-foreground"
                 >
                     <div className="flex items-center gap-1.5">
@@ -107,7 +101,7 @@ export function HeroSection() {
                         <div className="h-2 w-2 rounded-full bg-primary" />
                         <span>24/7 Support</span>
                     </div>
-                </motion.div>
+                </div>
             </div>
         </section>
     );

@@ -16,12 +16,12 @@ import {
 } from "@/components/ui/select";
 import { Reveal } from "@/components/reveal";
 
-export function TradeWidget() {
+export default function TradeWidget() {
     const [tradeType, setTradeType] = useState<"buy" | "sell">("buy");
 
     return (
         <Reveal width="100%" direction="up" delay={0.2} className="relative z-20 -mt-12 container max-w-4xl mx-auto px-4">
-            <div className="bg-card/80 backdrop-blur-xl border border-primary/20 rounded-3xl p-6 shadow-2xl shadow-primary/10">
+            <div className="bg-[#0a0a0f] border border-primary/20 rounded-3xl p-6 shadow-2xl shadow-primary/10 gpu">
                 <Tabs defaultValue="buy" className="w-full" onValueChange={(v) => setTradeType(v as "buy" | "sell")}>
                     <TabsList className="grid w-full grid-cols-2 bg-secondary/50 p-1 rounded-2xl mb-8 h-14">
                         <TabsTrigger

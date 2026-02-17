@@ -125,8 +125,16 @@
     @apply border-border;
   }
 
+  html {
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+  }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    overflow-x: hidden;
+    width: 100%;
   }
 
   .container {
@@ -142,11 +150,11 @@
 
   0%,
   100% {
-    transform: translateY(0px) scale(1);
+    transform: translateY(0);
   }
 
   50% {
-    transform: translateY(-30px) scale(1.05);
+    transform: translateY(-15px);
   }
 }
 
@@ -154,11 +162,11 @@
 
   0%,
   100% {
-    transform: translateY(0px) scale(1);
+    transform: translateY(0);
   }
 
   50% {
-    transform: translateY(20px) scale(0.95);
+    transform: translateY(10px);
   }
 }
 
@@ -167,12 +175,10 @@
   0%,
   100% {
     opacity: 0.4;
-    filter: blur(60px);
   }
 
   50% {
     opacity: 0.8;
-    filter: blur(80px);
   }
 }
 
@@ -248,17 +254,31 @@
 
 /* Glassmorphism 2.0 */
 .glass {
-  background: rgba(255, 255, 255, 0.03);
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(15, 15, 20, 0.85);
+  /* Solid dark instead of blur */
+  border: 1px solid rgba(133, 109, 71, 0.2);
 }
 
 .glass-strong {
-  background: rgba(255, 255, 255, 0.06);
-  -webkit-backdrop-filter: blur(40px);
-  backdrop-filter: blur(40px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(10, 10, 15, 0.95);
+  border: 1px solid rgba(133, 109, 71, 0.3);
+}
+
+.gpu {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+section {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 1000px;
+  /* Placeholder size for scrolling accuracy */
+}
+
+section:first-of-type {
+  content-visibility: visible;
+  /* Don't hide the hero */
 }
 
 /* Glow border on hover */
@@ -309,27 +329,30 @@
   animation: gradient-x 4s ease infinite;
 }
 
-/* Floating orb styles */
+/* Floating orb styles - Optimized for 60FPS */
 .orb {
   position: absolute;
   border-radius: 50%;
   pointer-events: none;
   z-index: 0;
+  will-change: transform;
+  /* Only will-change transform for better optimization */
 }
 
 .orb-gold {
-  background: radial-gradient(circle, rgba(201, 168, 76, 0.4), transparent 70%);
-  animation: float 8s ease-in-out infinite, glow-pulse 4s ease-in-out infinite;
+  background: radial-gradient(circle, rgba(201, 168, 76, 0.25) 0%, rgba(201, 168, 76, 0.1) 40%, transparent 75%);
+  animation: float 12s ease-in-out infinite;
+  /* Slower, simpler animation */
 }
 
 .orb-cyan {
-  background: radial-gradient(circle, rgba(0, 255, 255, 0.15), transparent 70%);
-  animation: float-reverse 10s ease-in-out infinite, glow-pulse 5s ease-in-out infinite;
+  background: radial-gradient(circle, rgba(0, 255, 255, 0.1) 0%, rgba(0, 255, 255, 0.05) 40%, transparent 75%);
+  animation: float-reverse 15s ease-in-out infinite;
 }
 
 .orb-violet {
-  background: radial-gradient(circle, rgba(138, 43, 226, 0.15), transparent 70%);
-  animation: float 12s ease-in-out infinite, glow-pulse 6s ease-in-out infinite;
+  background: radial-gradient(circle, rgba(138, 43, 226, 0.1) 0%, rgba(138, 43, 226, 0.05) 40%, transparent 75%);
+  animation: float 18s ease-in-out infinite;
 }
 
 /* Retro Grid */
@@ -340,13 +363,14 @@
   right: 0;
   height: 40%;
   background-image:
-    linear-gradient(rgba(133, 109, 71, 0.1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(133, 109, 71, 0.1) 1px, transparent 1px);
-  background-size: 60px 60px;
-  transform: perspective(500px) rotateX(60deg);
-  transform-origin: bottom;
-  -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.4), transparent 80%);
-  mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.4), transparent 80%);
+    linear-gradient(rgba(133, 109, 71, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(133, 109, 71, 0.08) 1px, transparent 1px);
+  background-size: 50px 50px;
+  background-position: center bottom;
+  opacity: 0.5;
+  -webkit-mask-image: linear-gradient(to top, black, transparent);
+  mask-image: linear-gradient(to top, black, transparent);
+  overflow: hidden;
 }
 
 /* Marquee */
@@ -354,6 +378,7 @@
   display: flex;
   width: max-content;
   animation: marquee 40s linear infinite;
+  will-change: transform;
 }
 
 .marquee-track:hover {

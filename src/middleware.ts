@@ -1,5 +1,6 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { ratelimit } from "@/lib/rate-limit";
 
 const isPublicRoute = createRouteMatcher([
     "/",
@@ -12,8 +13,24 @@ const isPublicRoute = createRouteMatcher([
     "/trade(.*)",
 ]);
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const isApiRoute = createRouteMatcher(["/api/(.*)"]);
+
 export default clerkMiddleware(async (auth: any, request: NextRequest) => {
+    // 1. Rate Limiting for API routes
+    if (isApiRoute(request)) {
+        try {
+            const ip = request.headers.get("x-forwarded-for") ?? "127.0.0.1";
+            const { success } = await ratelimit.limit(ip);
+            if (!success) {
+                return new NextResponse("Too Many Requests", { status: 429 });
+            }
+        } catch (e) {
+            // Fallback if Redis is down/misconfigured to avoid blocking production
+            console.error("Rate limit error:", e);
+        }
+    }
+
+    // 2. Auth Protection
     if (!isPublicRoute(request)) {
         await auth.protect();
     }

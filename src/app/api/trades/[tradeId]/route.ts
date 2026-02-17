@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { EscrowService } from "@/lib/escrow";
+import { logger } from "@/lib/logger";
 
 // GET: Fetch trade details with messages
 export async function GET(
@@ -33,12 +34,9 @@ export async function GET(
             return new NextResponse("Forbidden", { status: 403 });
         }
 
-        // Fetch escrow status
-        const escrow = await EscrowService.getByTradeId(tradeId);
-
-        return NextResponse.json({ ...trade, escrow });
+        return NextResponse.json(trade);
     } catch (error) {
-        console.error("[TRADE_GET]", error);
+        logger.error({ error }, `[TRADE_GET] Trade ID: ${(await params).tradeId}`);
         return new NextResponse("Internal Error", { status: 500 });
     }
 }
@@ -64,71 +62,48 @@ export async function PATCH(
         });
         if (!trade) return new NextResponse("Trade not found", { status: 404 });
 
-        let newStatus: any = trade.status;
-        const escrow = await EscrowService.getByTradeId(tradeId);
+        let result;
 
         switch (action) {
             case "FUND_ESCROW":
-                // Lock crypto into escrow when trade starts
                 if (trade.sellerId !== dbUser.id) {
                     return new NextResponse("Only seller can fund escrow", { status: 403 });
                 }
-                await EscrowService.lockFunds({
-                    tradeId,
-                    buyerId: trade.buyerId,
-                    sellerId: trade.sellerId,
-                    amountCrypto: Number(trade.amountCrypto),
-                    cryptocurrency: trade.offer?.cryptocurrency || "ETH",
-                });
-                newStatus = "ESCROW_LOCKED";
+                result = await EscrowService.lockFunds(tradeId);
                 break;
 
             case "PAID":
                 if (trade.buyerId !== dbUser.id)
                     return new NextResponse("Only buyer can mark as paid", { status: 403 });
-                newStatus = "PAID";
+                result = await prisma.trade.update({
+                    where: { id: tradeId },
+                    data: { status: "PAID" }
+                });
                 break;
 
             case "RELEASE":
                 if (trade.sellerId !== dbUser.id)
                     return new NextResponse("Only seller can release", { status: 403 });
-                // Release escrow funds
-                if (escrow) {
-                    await EscrowService.releaseFunds(escrow.id);
-                }
-                newStatus = "COMPLETED";
+                result = await EscrowService.releaseFunds(tradeId);
                 break;
 
             case "DISPUTE":
-                // Either party can open dispute
-                if (escrow) {
-                    await EscrowService.disputeEscrow(escrow.id);
-                }
-                newStatus = "DISPUTE";
+                result = await EscrowService.disputeTrade(tradeId);
                 break;
 
             case "CANCEL":
                 if ((trade.status as string) !== "PENDING" && (trade.status as string) !== "ESCROW_LOCKED")
                     return new NextResponse("Can only cancel pending/locked trades", { status: 400 });
-                // Refund escrow if funded
-                if (escrow && escrow.status === "FUNDED") {
-                    await EscrowService.refundFunds(escrow.id);
-                }
-                newStatus = "CANCELLED";
+                result = await EscrowService.refundFunds(tradeId);
                 break;
 
             default:
                 return new NextResponse("Invalid action", { status: 400 });
         }
 
-        const updated = await prisma.trade.update({
-            where: { id: tradeId },
-            data: { status: newStatus },
-        });
-
-        return NextResponse.json(updated);
+        return NextResponse.json(result);
     } catch (error: any) {
-        console.error("[TRADE_PATCH]", error);
+        logger.error({ error }, `[TRADE_PATCH] Trade ID: ${(await params).tradeId}`);
         return new NextResponse(error.message || "Internal Error", { status: 500 });
     }
 }
