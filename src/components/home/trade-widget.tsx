@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Search, ChevronDown, Coins, CreditCard, DollarSign } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -17,10 +18,23 @@ import {
 import { Reveal } from "@/components/reveal";
 
 export default function TradeWidget() {
+    const router = useRouter();
     const [tradeType, setTradeType] = useState<"buy" | "sell">("buy");
+    const [crypto, setCrypto] = useState("all");
+    const [payment, setPayment] = useState("all");
+    const [amount, setAmount] = useState("");
+
+    const handleSearch = () => {
+        const params = new URLSearchParams();
+        if (tradeType) params.set("type", tradeType.toUpperCase());
+        if (crypto !== "all") params.set("crypto", crypto.toUpperCase());
+        if (payment !== "all") params.set("payment", payment);
+        if (amount) params.set("amount", amount);
+        router.push(`/offers?${params.toString()}`);
+    };
 
     return (
-        <Reveal width="100%" direction="up" delay={0.2} className="relative z-20 -mt-12 container max-w-4xl mx-auto px-4">
+        <Reveal width="100%" direction="up" delay={0.2} className="relative z-20 container max-w-4xl mx-auto px-4 py-8">
             <div className="bg-[#0a0a0f] border border-primary/20 rounded-3xl p-6 shadow-2xl shadow-primary/10 gpu">
                 <Tabs defaultValue="buy" className="w-full" onValueChange={(v) => setTradeType(v as "buy" | "sell")}>
                     <TabsList className="grid w-full grid-cols-2 bg-secondary/50 p-1 rounded-2xl mb-8 h-14">
@@ -44,7 +58,7 @@ export default function TradeWidget() {
                             <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10 text-muted-foreground group-focus-within:text-primary transition-colors">
                                 <Coins className="h-5 w-5" />
                             </div>
-                            <Select defaultValue="all">
+                            <Select value={crypto} onValueChange={setCrypto}>
                                 <SelectTrigger className="w-full h-14 pl-12 bg-secondary/30 border-primary/10 rounded-2xl focus:ring-primary/20 text-lg font-medium">
                                     <SelectValue placeholder="All crypto" />
                                 </SelectTrigger>
@@ -67,7 +81,7 @@ export default function TradeWidget() {
                                 <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10 text-muted-foreground group-focus-within:text-primary transition-colors">
                                     <CreditCard className="h-5 w-5" />
                                 </div>
-                                <Select defaultValue="all">
+                                <Select value={payment} onValueChange={setPayment}>
                                     <SelectTrigger className="w-full h-14 pl-12 bg-secondary/30 border-primary/10 rounded-2xl focus:ring-primary/20 text-lg font-medium">
                                         <SelectValue placeholder="Payment method" />
                                     </SelectTrigger>
@@ -88,6 +102,8 @@ export default function TradeWidget() {
                             </div>
                             <Input
                                 placeholder="Amount"
+                                value={amount}
+                                onChange={(e) => setAmount(e.target.value)}
                                 className="h-14 pl-12 pr-16 bg-secondary/30 border-primary/10 rounded-2xl text-lg focus-visible:ring-primary/20"
                             />
                             <div className="absolute right-4 top-1/2 -translate-y-1/2 bg-zinc-800 px-3 py-1 rounded-lg text-xs font-bold text-white tracking-wider">
@@ -97,6 +113,7 @@ export default function TradeWidget() {
 
                         {/* Search Button */}
                         <Button
+                            onClick={handleSearch}
                             className="w-full h-16 rounded-2xl text-xl font-bold transition-all shadow-lg hover:shadow-green-500/20 active:scale-[0.98]"
                             variant={tradeType === "buy" ? "default" : "secondary"}
                             style={{ backgroundColor: tradeType === "buy" ? "#22c55e" : undefined }}

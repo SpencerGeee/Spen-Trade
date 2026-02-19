@@ -7,6 +7,10 @@
 @theme {
   --font-sans: var(--font-jost);
   --font-serif: var(--font-playfair);
+  --font-nixie: var(--font-nixie);
+  --font-montserrat: var(--font-montserrat);
+  --font-fauna: var(--font-fauna);
+  --font-garamond: var(--font-garamond);
 
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
@@ -137,6 +141,16 @@
     width: 100%;
   }
 
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-garamond) !important;
+    font-weight: 400 !important;
+  }
+
   .container {
     @apply mx-auto px-4 md:px-6 lg:px-8 max-w-7xl w-full;
   }
@@ -248,6 +262,38 @@
   }
 }
 
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+    filter: blur(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes reveal-glass {
+  0% {
+    opacity: 0;
+    background: rgba(255, 255, 255, 0);
+    -webkit-backdrop-filter: blur(0px);
+    backdrop-filter: blur(0px);
+    transform: translateY(20px);
+  }
+
+  100% {
+    opacity: 1;
+    background: rgba(15, 15, 20, 0.85);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    transform: translateY(0);
+  }
+}
+
 /* ═══════════════════════════════════════
    UTILITY CLASSES — Glassmorphism & FX
    ═══════════════════════════════════════ */
@@ -257,11 +303,15 @@
   background: rgba(15, 15, 20, 0.85);
   /* Solid dark instead of blur */
   border: 1px solid rgba(133, 109, 71, 0.2);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
 }
 
 .glass-strong {
   background: rgba(10, 10, 15, 0.95);
   border: 1px solid rgba(133, 109, 71, 0.3);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
 }
 
 .gpu {

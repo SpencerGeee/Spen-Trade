@@ -1,47 +1,70 @@
 "use client";
 
-import { GlassCard } from "@/components/ui/glass-card";
-import { ShinyButton } from "@/components/ui/shiny-button";
-import { useWeb3Modal } from '@web3modal/wagmi/react'
-import { useAccount, useBalance, useDisconnect } from 'wagmi'
-import { formatUnits } from 'viem'
-import { Wallet, ArrowDownLeft, ArrowUpRight, History, LogOut, Loader2, ArrowRight } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useAccount, useDisconnect, useBalance } from "wagmi";
+import { useWeb3Modal } from '@web3modal/wagmi/react';
 import { useQuery } from "@tanstack/react-query";
-import Link from "next/link";
-
-function formatBalance(value: bigint | undefined, decimals: number | undefined): string {
-    if (value === undefined || decimals === undefined) return "0.00";
-    return formatUnits(value, decimals);
-}
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Loader2, Copy, Wallet as WalletIcon, ArrowUpRight, ArrowDownLeft, TrendingUp, CreditCard } from "lucide-react";
+import { Reveal } from "@/components/reveal";
+import { useState, useEffect, useCallback } from "react";
+import { QRCodeSVG } from "qrcode.react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { initOnRamp } from "@coinbase/cbpay-js";
 
 export default function WalletPage() {
-    const { open } = useWeb3Modal()
-    const { address, isConnected } = useAccount()
-    const { disconnect } = useDisconnect()
+    const { open } = useWeb3Modal();
+    const { address, isConnected } = useAccount();
+    const { disconnect } = useDisconnect();
 
-    // Fetch ETH balance from wagmi
-    const { data: ethBalance } = useBalance({
-        address: address,
-    })
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => setMounted(true), []);
 
-    // Fetch account stats & transactions from DB
-    const { data: dbStats, isLoading } = useQuery({
-        queryKey: ["user-stats"],
+    // Internal Wallet Query
+    const { data: internalWallet, isLoading: isLoadingInternal } = useQuery({
+        queryKey: ["internal-wallet"],
         queryFn: async () => {
-            const res = await fetch("/api/user/stats");
-            if (!res.ok) throw new Error("Failed to fetch stats");
+            const res = await fetch("/api/wallet");
+            if (!res.ok) throw new Error("Failed to fetch wallet");
             return res.json();
         },
     });
 
-    const [mounted, setMounted] = useState(false)
-    useEffect(() => setMounted(true), [])
+    const handleCoinbaseBuy = useCallback(() => {
+        if (!internalWallet?.address) return;
 
-    const formattedETH = ethBalance ? formatBalance(ethBalance.value, ethBalance.decimals) : "0";
-    const ethUSD = (Number(formattedETH) * 3000).toFixed(2);
+        initOnRamp({
+            appId: "0215f143-7371-4ae5-802a-8f71657b9f49",
+            widgetParameters: {
+                destinationWallets: [
+                    {
+                        address: internalWallet.address,
+                        blockchains: ["ethereum"],
+                        assets: ["USDT"]
+                    }
+                ],
+            },
+            onExit: () => console.log('Exited Coinbase Pay'),
+            onSuccess: () => console.log('Successfully purchased via Coinbase'),
+            experienceLoggedIn: 'embedded',
+            experienceLoggedOut: 'popup',
+        }, (error, instance) => {
+            if (error) {
+                console.error("Coinbase Onramp Error:", error);
+                return;
+            }
+            if (instance) {
+                instance.open();
+            }
+        });
+    }, [internalWallet?.address]);
 
-    if (isLoading) {
+    const copyAddress = (addr: string) => {
+        navigator.clipboard.writeText(addr);
+        alert("Address Copied");
+    };
+
+    if (isLoadingInternal) {
         return (
             <div className="flex h-[60vh] items-center justify-center">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -50,138 +73,177 @@ export default function WalletPage() {
     }
 
     return (
-        <div className="container mx-auto space-y-8 py-8">
-            <div className="flex items-center justify-between px-4 sm:px-0">
-                <h1 className="text-3xl font-bold font-serif text-primary">Wallet</h1>
-                <div className="flex gap-2">
-                    {mounted && isConnected && (
-                        <ShinyButton onClick={() => disconnect()} className="bg-destructive/10 text-destructive hover:bg-destructive/20 ml-2" icon={false}>
-                            <LogOut className="h-4 w-4" />
-                        </ShinyButton>
-                    )}
-                    <ShinyButton onClick={() => open()}>
-                        {mounted && isConnected ? `${address?.slice(0, 6)}...${address?.slice(-4)}` : "Connect Wallet"}
-                    </ShinyButton>
-                </div>
+        <div className="w-full py-10 space-y-8">
+            <div className="space-y-4 mb-12">
+                <Reveal direction="down" delay={0.1}>
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-semibold uppercase tracking-[0.2em]">
+                        <WalletIcon className="h-3.5 w-3.5" />
+                        Asset Custody
+                    </div>
+                </Reveal>
+                <Reveal direction="down" delay={0.2} width="100%">
+                    <h1 className="text-4xl md:text-6xl font-montserrat font-extrabold tracking-tighter">My <span className="text-gradient-gold">Digital Vault</span></h1>
+                </Reveal>
+                <Reveal direction="down" delay={0.3}>
+                    <p className="text-muted-foreground text-lg font-medium opacity-80 max-w-2xl">
+                        Securely manage your global portfolio and fragmented institutional connections.
+                    </p>
+                </Reveal>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 px-4 sm:px-0">
-                {/* Total Balance Card */}
-                <GlassCard className="lg:col-span-2">
-                    <div className="flex flex-col gap-2">
-                        <span className="text-muted-foreground">User Assets (Estimated)</span>
-                        <span className="text-4xl font-bold font-serif">
-                            {dbStats?.stats.totalBalance || "$0.00"}
-                        </span>
-                        <span className="text-sm text-green-500 flex items-center gap-1">
-                            <ArrowUpRight className="h-4 w-4" /> Real-time tracking enabled
-                        </span>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8">
-                        <div className="p-4 rounded-xl bg-background/30 border border-white/5 flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                                <div className="h-10 w-10 rounded-full bg-blue-500/20 flex items-center justify-center text-xs font-bold text-blue-500">
-                                    ETH
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Internal SpenTrade Wallet */}
+                <Reveal direction="right" width="100%" delay={0.4}>
+                    <Card className="h-full border-white/10 glass-strong shadow-2xl rounded-[2.5rem] overflow-hidden group">
+                        <CardHeader className="border-b border-white/5 pb-6">
+                            <CardTitle className="flex items-center gap-3 font-montserrat uppercase tracking-widest text-sm font-bold text-primary/80">
+                                <WalletIcon className="h-5 w-5" />
+                                SpenTrade Institutional Vault
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-8 pt-8">
+                            <div className="bg-white/5 p-10 rounded-[2rem] border border-white/5 text-center relative overflow-hidden group-hover:bg-white/[0.07] transition-colors">
+                                <div className="absolute top-0 right-0 p-8 opacity-5">
+                                    <TrendingUp className="h-32 w-32" />
                                 </div>
-                                <div>
-                                    <p className="font-medium">Ethereum</p>
-                                    <p className="text-xs text-muted-foreground">
-                                        {mounted && isConnected ? Number(formattedETH).toFixed(4) : "0.00"} ETH
-                                    </p>
-                                </div>
+                                <p className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground mb-4">Secured Liquidity</p>
+                                <h2 className="text-5xl font-montserrat font-black tracking-tighter text-gradient-gold mb-2">
+                                    ${Number(internalWallet?.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                </h2>
+                                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/40">{internalWallet?.currency || 'USDT PROTOCOL'}</p>
                             </div>
-                            <p className="font-semibold">
-                                {mounted && isConnected ? `$${ethUSD}` : "$0.00"}
-                            </p>
-                        </div>
 
-                        <div className="p-4 rounded-xl bg-background/30 border border-white/5 flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                                <div className="h-10 w-10 rounded-full bg-green-500/20 flex items-center justify-center text-xs font-bold text-green-500">
-                                    USDT
-                                </div>
-                                <div>
-                                    <p className="font-medium">Tether</p>
-                                    <p className="text-xs text-muted-foreground">Available for trades</p>
-                                </div>
-                            </div>
-                            <p className="font-semibold">$0.00</p>
-                        </div>
-                    </div>
-                </GlassCard>
+                            <Tabs defaultValue="deposit" className="w-full">
+                                <TabsList className="grid w-full grid-cols-2 h-14 bg-white/5 rounded-2xl p-1.5 mb-8">
+                                    <TabsTrigger value="deposit" className="rounded-xl font-bold uppercase tracking-widest text-[10px]">Inbound Asset</TabsTrigger>
+                                    <TabsTrigger value="withdraw" className="rounded-xl font-bold uppercase tracking-widest text-[10px]">Outbound Asset</TabsTrigger>
+                                </TabsList>
+                                <TabsContent value="deposit" className="space-y-6 pt-2">
+                                    <div className="flex flex-col items-center justify-center p-6 bg-white rounded-3xl w-fit mx-auto shadow-2xl">
+                                        <QRCodeSVG value={internalWallet?.address || ""} size={160} />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-primary/60 ml-1">Receive Address (ERC20)</p>
+                                        <div className="flex items-center gap-2 glass border-white/10 p-4 rounded-2xl">
+                                            <code className="flex-1 text-xs truncate font-mono font-bold tracking-wider">{internalWallet?.address}</code>
+                                            <Button size="icon" variant="ghost" onClick={() => copyAddress(internalWallet?.address)} className="hover:bg-primary/10 hover:text-primary rounded-xl">
+                                                <Copy className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-6">
+                                        {/* Coinbase Buy Button */}
+                                        <Button
+                                            onClick={handleCoinbaseBuy}
+                                            variant="outline"
+                                            className="w-full h-14 rounded-2xl border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary font-black uppercase tracking-widest text-[10px] gap-3"
+                                        >
+                                            <CreditCard className="h-4 w-4" />
+                                            Purchase via Coinbase Pay
+                                        </Button>
 
-                {/* Quick Actions */}
-                <GlassCard className="flex flex-col justify-center gap-4">
-                    <button className="flex items-center justify-between p-4 rounded-xl bg-primary/10 hover:bg-primary/20 transition-colors group">
-                        <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
-                                <ArrowDownLeft className="h-5 w-5" />
-                            </div>
-                            <div className="text-left">
-                                <p className="font-semibold">Deposit</p>
-                                <p className="text-xs text-muted-foreground">Add funds to wallet</p>
-                            </div>
-                        </div>
-                    </button>
+                                        <p className="text-[10px] text-center font-bold uppercase tracking-widest text-muted-foreground/40 px-6">
+                                            Transmit only USDT through the Ethereum network. <br />Misdirected assets are unrecoverable.
+                                        </p>
+                                    </div>
+                                </TabsContent>
+                                <TabsContent value="withdraw" className="space-y-6 pt-2">
+                                    <div className="p-6 border border-primary/20 bg-primary/5 rounded-3xl text-xs font-bold uppercase tracking-[0.15em] text-primary/80 leading-relaxed text-center italic">
+                                        Withdrawal protocols are currently operating under manual high-security verification.
+                                    </div>
+                                    <Button className="w-full h-14 rounded-2xl font-black uppercase tracking-widest text-xs opacity-50 grayscale cursor-not-allowed" disabled>Inquiry Locked (Beta)</Button>
+                                </TabsContent>
+                            </Tabs>
+                        </CardContent>
+                    </Card>
+                </Reveal>
 
-                    <button className="flex items-center justify-between p-4 rounded-xl bg-secondary/50 hover:bg-secondary/70 transition-colors group">
-                        <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center">
-                                <ArrowUpRight className="h-5 w-5" />
-                            </div>
-                            <div className="text-left">
-                                <p className="font-semibold">Withdraw</p>
-                                <p className="text-xs text-muted-foreground">Transfer to external wallet</p>
-                            </div>
-                        </div>
-                    </button>
-                </GlassCard>
+                {/* External Web3 Wallet */}
+                <Reveal direction="left" width="100%" delay={0.5}>
+                    <Card className="h-full border-white/10 glass shadow-2xl rounded-[2.5rem] overflow-hidden">
+                        <CardHeader className="border-b border-white/5 pb-6">
+                            <CardTitle className="font-montserrat uppercase tracking-widest text-sm font-bold text-muted-foreground/80">External Connection</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-8 pt-8">
+                            {!(mounted && isConnected) ? (
+                                <div className="text-center py-12 space-y-8">
+                                    <div className="p-8 bg-primary/5 rounded-[2rem] w-24 h-24 mx-auto flex items-center justify-center border border-primary/10 shadow-inner">
+                                        <WalletIcon className="h-10 w-10 text-primary opacity-80" />
+                                    </div>
+                                    <div className="space-y-3">
+                                        <h3 className="text-2xl font-montserrat font-black tracking-tight uppercase">Bypass Custody</h3>
+                                        <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 max-w-xs mx-auto leading-relaxed">
+                                            Interface with the blockchain via decentralized infrastructure (MetaMask, WalletConnect).
+                                        </p>
+                                    </div>
+                                    <Button onClick={() => open()} variant="gold" size="lg" className="h-14 rounded-2xl w-full max-w-[280px] font-black uppercase tracking-widest text-[10px] shadow-xl shadow-primary/20">
+                                        <WalletIcon className="h-4 w-4 mr-3" />
+                                        Initialize Link
+                                    </Button>
+                                </div>
+                            ) : (
+                                <div className="space-y-6">
+                                    <div className="bg-primary/5 p-6 rounded-3xl border border-primary/20 flex flex-col gap-4">
+                                        <div className="flex items-center justify-between">
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-primary/60">Linked Protocol</p>
+                                            <div className="flex items-center gap-2">
+                                                <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                                                <span className="text-[10px] font-black uppercase tracking-widest text-green-500">Active</span>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center justify-between p-4 glass border-white/10 rounded-2xl">
+                                            <code className="text-xs font-bold tracking-tight truncate max-w-[200px]">{address}</code>
+                                            <Button variant="ghost" size="sm" onClick={() => disconnect()} className="h-8 text-[10px] font-black uppercase tracking-widest text-red-400 hover:text-red-500 hover:bg-red-500/10 rounded-lg">Terminate</Button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                </Reveal>
             </div>
 
             {/* Transaction History */}
-            <GlassCard>
-                <div className="flex items-center justify-between mb-6">
-                    <h3 className="flex items-center gap-2 text-xl font-semibold">
-                        <History className="h-5 w-5 text-primary" />
-                        Recent Activity
-                    </h3>
-                    <Link href="/dashboard/history" className="text-sm text-primary hover:underline">View all</Link>
-                </div>
-
-                <div className="space-y-4">
-                    {dbStats?.recentActivity && dbStats.recentActivity.length > 0 ? (
-                        dbStats.recentActivity.map((tx: any) => (
-                            <div key={tx.id} className="flex items-center justify-between p-4 rounded-xl glass hover:bg-white/5 transition-colors">
-                                <div className="flex items-center gap-4">
-                                    <div className={`h-10 w-10 rounded-full flex items-center justify-center ${tx.type === "DEPOSIT" ? "bg-green-500/20 text-green-500" : "bg-red-500/20 text-red-500"
-                                        }`}>
-                                        {tx.type === "DEPOSIT" ? <ArrowDownLeft className="h-5 w-5" /> : <ArrowUpRight className="h-5 w-5" />}
+            <Reveal direction="up" delay={0.6}>
+                <Card className="border-white/10 glass rounded-[2.5rem] overflow-hidden shadow-2xl">
+                    <CardHeader className="border-b border-white/5 py-8">
+                        <CardTitle className="font-montserrat uppercase tracking-widest text-sm font-black text-primary/80">Audit Trail</CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                        {internalWallet?.transactions?.length > 0 ? (
+                            <div className="divide-y divide-white/5">
+                                {internalWallet.transactions.map((tx: any) => (
+                                    <div key={tx.id} className="flex items-center justify-between p-6 hover:bg-white/5 transition-all duration-300">
+                                        <div className="flex items-center gap-5">
+                                            <div className={`h-12 w-12 rounded-2xl flex items-center justify-center ${tx.type === 'DEPOSIT' ? 'bg-green-500/10 text-green-500 border border-green-500/20' : 'bg-red-500/10 text-red-500 border border-red-500/20'}`}>
+                                                {tx.type === 'DEPOSIT' ? <ArrowDownLeft className="h-6 w-6" /> : <ArrowUpRight className="h-6 w-6" />}
+                                            </div>
+                                            <div>
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <p className="font-black text-[10px] uppercase tracking-widest">{tx.type}</p>
+                                                    <span className={`text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded bg-white/5 ${tx.status === 'COMPLETED' ? 'text-green-500' : 'text-primary'}`}>{tx.status}</span>
+                                                </div>
+                                                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">{new Date(tx.createdAt).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+                                            </div>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className={`text-lg font-montserrat font-black tracking-tighter ${tx.type === 'DEPOSIT' ? 'text-green-500' : 'text-white'}`}>
+                                                {tx.type === 'DEPOSIT' ? '+' : '-'}{Number(tx.amount).toLocaleString(undefined, { minimumFractionDigits: 4 })}
+                                            </p>
+                                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">{tx.currency}</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p className="font-medium uppercase text-sm">{tx.type}</p>
-                                        <p className="text-xs text-muted-foreground">{new Date(tx.createdAt).toLocaleDateString()}</p>
-                                    </div>
-                                </div>
-                                <div className="text-right">
-                                    <p className="font-bold">{tx.type === "DEPOSIT" ? "+" : "-"}{tx.amount} {tx.currency}</p>
-                                    <p className={`text-[10px] font-bold px-2 py-0.5 rounded-full inline-block ${tx.status === "COMPLETED" ? "bg-green-500/10 text-green-500" : "bg-yellow-500/10 text-yellow-500"
-                                        }`}>
-                                        {tx.status}
-                                    </p>
-                                </div>
+                                ))}
                             </div>
-                        ))
-                    ) : (
-                        <div className="text-center py-12 text-muted-foreground">
-                            <div className="h-12 w-12 bg-background/30 rounded-full flex items-center justify-center mx-auto mb-3">
-                                <History className="h-6 w-6 opacity-50" />
+                        ) : (
+                            <div className="py-20 text-center flex flex-col items-center gap-4">
+                                <TrendingUp className="h-12 w-12 text-muted-foreground/20" />
+                                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/40">No institutional history found</p>
                             </div>
-                            <p>No transactions yet</p>
-                        </div>
-                    )}
-                </div>
-            </GlassCard>
+                        )}
+                    </CardContent>
+                </Card>
+            </Reveal>
         </div>
     );
 }

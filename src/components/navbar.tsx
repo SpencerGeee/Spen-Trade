@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, Search } from "lucide-react";
+import { Menu, Search, LayoutDashboard } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,9 @@ import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 
 export function Navbar() {
     const pathname = usePathname();
+
+    // Dashboard has its own header — hide the global Navbar there
+    if (pathname.startsWith("/dashboard")) return null;
 
     return (
         <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
@@ -63,11 +66,10 @@ export function Navbar() {
                         </SignedOut>
                         <SignedIn>
                             <Link href="/dashboard">
-                                <Button variant="ghost">Dashboard</Button>
-                            </Link>
-                            {/* Admin Link Placeholder - Real check would look at user metadata or DB role */}
-                            <Link href="/admin">
-                                <Button variant="ghost" className="text-primary hover:text-primary hover:bg-primary/10 font-bold border border-primary/20">Admin</Button>
+                                <Button variant="outline" className="gap-2">
+                                    <LayoutDashboard className="h-4 w-4" />
+                                    Dashboard
+                                </Button>
                             </Link>
                             <UserButton afterSignOutUrl="/" />
                         </SignedIn>
@@ -112,11 +114,14 @@ export function Navbar() {
                                             </SignInButton>
                                         </SignedOut>
                                         <SignedIn>
-                                            <Link href="/dashboard" className="w-full">
-                                                <Button variant="outline" className="w-full">Dashboard</Button>
+                                            <Link href="/dashboard">
+                                                <Button variant="outline" className="w-full gap-2">
+                                                    <LayoutDashboard className="h-4 w-4" />
+                                                    Dashboard
+                                                </Button>
                                             </Link>
-                                            <div className="flex items-center justify-between p-2 border rounded-lg">
-                                                <span className="text-sm font-medium">Account</span>
+                                            <div className="flex items-center justify-between p-3 border rounded-xl bg-primary/5">
+                                                <span className="text-sm font-medium">Profile</span>
                                                 <UserButton afterSignOutUrl="/" />
                                             </div>
                                         </SignedIn>

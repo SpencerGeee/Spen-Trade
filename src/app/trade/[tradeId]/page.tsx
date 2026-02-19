@@ -142,7 +142,7 @@ export default function TradePage({ params }: TradePageProps) {
                 <GlassCard>
                     <div className="space-y-4">
                         <div className="flex items-center justify-between">
-                            <h2 className="text-xl font-bold font-serif">Trade Details</h2>
+                            <h2 className="text-xl font-bold font-montserrat">Trade Details</h2>
                             <span className={`flex items-center gap-1 font-semibold text-sm ${statusInfo.color}`}>
                                 {statusInfo.icon} {statusInfo.label}
                             </span>
@@ -271,7 +271,7 @@ export default function TradePage({ params }: TradePageProps) {
             {/* Chat Panel */}
             <GlassCard className="lg:col-span-2 flex flex-col h-[70vh]">
                 <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
-                    <h2 className="text-xl font-bold font-serif">Trade Chat</h2>
+                    <h2 className="text-xl font-bold font-montserrat">Trade Chat</h2>
                     <span className="text-xs text-muted-foreground">
                         {isBuyer ? "Buyer" : "Seller"} • Trading with{" "}
                         <span className="text-primary font-medium">

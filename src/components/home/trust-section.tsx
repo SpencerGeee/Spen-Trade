@@ -36,7 +36,7 @@ export default function TrustSection() {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.1 }}
-                        className="font-serif text-3xl md:text-4xl font-bold"
+                        className="font-montserrat text-3xl md:text-4xl font-bold"
                     >
                         Your Security is Our{" "}
                         <span className="text-gradient-gold">Priority</span>

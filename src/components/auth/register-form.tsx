@@ -53,17 +53,17 @@ export function RegisterForm() {
     return (
         <div className="grid gap-6">
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                     <FormField
                         control={form.control}
                         name="fullName"
                         render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Full Name</FormLabel>
+                            <FormItem className="space-y-2">
+                                <FormLabel className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60 ml-1">Full Identity</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="John Doe" {...field} />
+                                    <Input placeholder="John Spencer" className="h-14 rounded-2xl glass border-white/10 focus:border-primary/50 transition-all px-6" {...field} />
                                 </FormControl>
-                                <FormMessage />
+                                <FormMessage className="text-[10px] uppercase font-bold tracking-widest" />
                             </FormItem>
                         )}
                     />
@@ -71,67 +71,69 @@ export function RegisterForm() {
                         control={form.control}
                         name="email"
                         render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Email</FormLabel>
+                            <FormItem className="space-y-2">
+                                <FormLabel className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60 ml-1">Digital Address</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="name@example.com" {...field} />
+                                    <Input placeholder="name@infrastructure.com" className="h-14 rounded-2xl glass border-white/10 focus:border-primary/50 transition-all px-6" {...field} />
                                 </FormControl>
-                                <FormMessage />
+                                <FormMessage className="text-[10px] uppercase font-bold tracking-widest" />
                             </FormItem>
                         )}
                     />
-                    <FormField
-                        control={form.control}
-                        name="password"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Password</FormLabel>
-                                <FormControl>
-                                    <Input type="password" placeholder="••••••••" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="confirmPassword"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Confirm Password</FormLabel>
-                                <FormControl>
-                                    <Input type="password" placeholder="••••••••" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <Button type="submit" className="w-full" disabled={isLoading} variant="gold">
-                        {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Create Account
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <FormField
+                            control={form.control}
+                            name="password"
+                            render={({ field }) => (
+                                <FormItem className="space-y-2">
+                                    <FormLabel className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60 ml-1">Security Key</FormLabel>
+                                    <FormControl>
+                                        <Input type="password" placeholder="••••••••" className="h-14 rounded-2xl glass border-white/10 focus:border-primary/50 transition-all px-6" {...field} />
+                                    </FormControl>
+                                    <FormMessage className="text-[10px] uppercase font-bold tracking-widest" />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="confirmPassword"
+                            render={({ field }) => (
+                                <FormItem className="space-y-2">
+                                    <FormLabel className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60 ml-1">Verify Key</FormLabel>
+                                    <FormControl>
+                                        <Input type="password" placeholder="••••••••" className="h-14 rounded-2xl glass border-white/10 focus:border-primary/50 transition-all px-6" {...field} />
+                                    </FormControl>
+                                    <FormMessage className="text-[10px] uppercase font-bold tracking-widest" />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                    <Button type="submit" className="w-full h-14 rounded-2xl text-xs font-black uppercase tracking-[0.2em] shadow-xl shadow-primary/20" disabled={isLoading} variant="gold">
+                        {isLoading && <Loader2 className="mr-3 h-4 w-4 animate-spin" />}
+                        Initialize Identity
                     </Button>
                 </form>
             </Form>
-            <div className="relative">
+            <div className="relative py-4">
                 <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t" />
+                    <span className="w-full border-t border-white/5" />
                 </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-background px-2 text-muted-foreground">
-                        Or continue with
+                <div className="relative flex justify-center text-[10px] font-black uppercase tracking-[0.3em]">
+                    <span className="bg-background px-4 text-muted-foreground/40">
+                        Alternative Protocol
                     </span>
                 </div>
             </div>
-            <Button variant="outline" type="button" disabled={isLoading}>
-                Google
+            <Button variant="outline" type="button" disabled={isLoading} className="h-14 rounded-2xl border-white/10 glass text-[10px] font-black uppercase tracking-[0.2em] hover:bg-white/5">
+                Authenticate with Google
             </Button>
-            <p className="px-8 text-center text-sm text-muted-foreground">
-                Already have an account?{" "}
+            <p className="px-8 text-center text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 leading-relaxed">
+                Already part of the infrastructure?{" "}
                 <Link
                     href="/login"
-                    className="underline underline-offset-4 hover:text-primary"
+                    className="text-primary hover:text-primary/80 transition-colors underline-offset-4 underline"
                 >
-                    Sign In
+                    Authorize Session
                 </Link>
             </p>
         </div>

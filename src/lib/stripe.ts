@@ -1,6 +1,6 @@
 import Stripe from "stripe";
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    apiVersion: "2024-12-18.acacia", // Use latest API version available or from package
+    apiVersion: "2025-01-27.acacia" as any, // Cast to avoid strict type mismatch with local SDK version
     typescript: true,
 });

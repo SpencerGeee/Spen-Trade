@@ -77,7 +77,7 @@ export default function StatsSection() {
                             transition={{ delay: index * 0.15, duration: 0.6 }}
                             className="text-center glass rounded-2xl p-8 glow-border"
                         >
-                            <div className="text-4xl md:text-5xl font-bold font-serif text-gradient-gold mb-3">
+                            <div className="text-4xl md:text-5xl font-bold font-montserrat text-gradient-gold mb-3">
                                 <AnimatedCounter
                                     target={stat.value}
                                     prefix={stat.prefix}

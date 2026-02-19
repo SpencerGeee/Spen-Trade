@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/select";
 import { GlassCard } from "@/components/ui/glass-card";
 import { ShinyButton } from "@/components/ui/shiny-button";
-import { Loader2, CheckCircle2 } from "lucide-react";
+import { Loader2, CheckCircle2, ShieldCheck } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
@@ -76,18 +76,28 @@ export function KycForm() {
     };
 
     return (
-        <GlassCard className="max-w-2xl mx-auto">
-            <div className="mb-8">
-                <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-white bg-clip-text text-transparent">
-                        Identity Verification
-                    </h2>
-                    <span className="text-sm text-muted-foreground">Step {step} of 2</span>
+        <GlassCard className="max-w-2xl mx-auto border-white/10 glass-strong shadow-2xl rounded-[2.5rem] p-10 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity">
+                <CheckCircle2 className="h-32 w-32" />
+            </div>
+
+            <div className="relative z-10 mb-12">
+                <div className="flex items-center justify-between mb-6">
+                    <div>
+                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60 mb-1">Clearance Phase</p>
+                        <h2 className="text-2xl font-montserrat font-black tracking-tight text-foreground">
+                            Identity Verification
+                        </h2>
+                    </div>
+                    <div className="text-right">
+                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/40 mb-1">Sequence</p>
+                        <span className="text-sm font-black tracking-widest text-primary">{step} / 2</span>
+                    </div>
                 </div>
                 {/* Progress Bar */}
-                <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
+                <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden border border-white/5 p-[1px]">
                     <div
-                        className="h-full bg-primary transition-all duration-500 ease-out"
+                        className="h-full bg-gradient-to-r from-primary/80 to-primary rounded-full transition-all duration-700 ease-in-out shadow-[0_0_10px_rgba(133,109,71,0.3)]"
                         style={{ width: `${(step / 2) * 100}%` }}
                     />
                 </div>
@@ -104,9 +114,9 @@ export function KycForm() {
                                     name="firstName"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>First Name</FormLabel>
+                                            <FormLabel className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60 ml-1">Legal Giver Name</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="John" {...field} className="bg-background/50" />
+                                                <Input placeholder="John" {...field} className="h-14 rounded-xl border-white/10 bg-white/5 focus:bg-white/10 transition-all font-bold" />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -117,9 +127,9 @@ export function KycForm() {
                                     name="lastName"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Last Name</FormLabel>
+                                            <FormLabel className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60 ml-1">Legal Surname</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="Doe" {...field} className="bg-background/50" />
+                                                <Input placeholder="Doe" {...field} className="h-14 rounded-xl border-white/10 bg-white/5 focus:bg-white/10 transition-all font-bold" />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -146,10 +156,10 @@ export function KycForm() {
                                 name="country"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Country of Residence</FormLabel>
+                                        <FormLabel className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60 ml-1">Jurisdiction of Residence</FormLabel>
                                         <FormControl>
                                             {/* In production this would be a comprehensive Select */}
-                                            <Input placeholder="Ghana" {...field} className="bg-background/50" />
+                                            <Input placeholder="Ghana" {...field} className="h-14 rounded-xl border-white/10 bg-white/5 focus:bg-white/10 transition-all font-bold" />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -183,48 +193,51 @@ export function KycForm() {
                                 )}
                             />
 
-                            <div className="rounded-lg border-2 border-dashed border-primary/20 p-8 text-center hover:bg-primary/5 transition-colors cursor-pointer">
-                                <div className="mx-auto h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                                    <CheckCircle2 className="h-6 w-6 text-primary" />
+                            <div className="rounded-3xl border-2 border-dashed border-white/10 p-12 text-center hover:bg-white/5 hover:border-primary/20 transition-all duration-500 cursor-pointer group/upload">
+                                <div className="mx-auto h-16 w-16 rounded-2xl bg-primary/5 flex items-center justify-center mb-6 border border-white/5 group-hover/upload:scale-110 group-hover/upload:bg-primary/10 transition-all duration-500">
+                                    <CheckCircle2 className="h-8 w-8 text-primary/40 group-hover/upload:text-primary transition-colors" />
                                 </div>
-                                <h3 className="text-lg font-semibold">Upload ID Document</h3>
-                                <p className="text-sm text-muted-foreground mt-2">
-                                    Drag and drop or click to upload front side.
+                                <h3 className="text-xl font-montserrat font-black tracking-tight mb-2">Initialize Asset Scan</h3>
+                                <p className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 leading-relaxed">
+                                    Upload a high-fidelity scan of your primary identification instrument.
                                 </p>
-                                <p className="text-xs text-muted-foreground mt-1">(Mock Upload for MVP)</p>
+                                <p className="text-[9px] font-bold text-primary/40 mt-6 uppercase tracking-[0.3em] font-mono">Secure TLS Uplink Enabled</p>
                             </div>
                         </div>
                     )}
 
-                    <div className="flex justify-between pt-6">
+                    <div className="flex justify-between pt-10 border-t border-white/5">
                         {step > 1 && (
                             <Button
                                 type="button"
                                 variant="ghost"
                                 onClick={() => setStep(step - 1)}
+                                className="h-14 rounded-xl px-8 font-black uppercase tracking-widest text-[10px] hover:bg-white/5"
                             >
-                                Back
+                                Previous Sequence
                             </Button>
                         )}
 
-                        {step < 2 ? (
-                            <ShinyButton
-                                type="button"
-                                onClick={nextStep}
-                                className="ml-auto"
-                            >
-                                Continue
-                            </ShinyButton>
-                        ) : (
-                            <ShinyButton
-                                type="submit"
-                                className="ml-auto"
-                                disabled={mutation.isPending}
-                            >
-                                {mutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                Submit Application
-                            </ShinyButton>
-                        )}
+                        <div className="ml-auto flex gap-4">
+                            {step < 2 ? (
+                                <ShinyButton
+                                    type="button"
+                                    onClick={nextStep}
+                                    className="h-14 rounded-xl px-10 font-black uppercase tracking-widest text-[10px]"
+                                >
+                                    Proceed to Governance
+                                </ShinyButton>
+                            ) : (
+                                <ShinyButton
+                                    type="submit"
+                                    className="h-14 rounded-xl px-10 font-black uppercase tracking-widest text-[10px]"
+                                    disabled={mutation.isPending}
+                                >
+                                    {mutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin text-primary" /> : <ShieldCheck className="mr-2 h-4 w-4" />}
+                                    Finalize Application
+                                </ShinyButton>
+                            )}
+                        </div>
                     </div>
                 </form>
             </Form>

@@ -4,7 +4,7 @@ import "@nomicfoundation/hardhat-toolbox";
 const config: HardhatUserConfig = {
     solidity: "0.8.28",
     networks: {
-        hardhat: {},
+        // default hardhat network is used if none specified
         // sepolia: { ... } // Add when needed
     },
     paths: {

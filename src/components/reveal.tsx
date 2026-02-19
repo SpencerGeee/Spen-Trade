@@ -1,24 +1,24 @@
 "use client";
-
-import React, { useEffect, useRef } from "react";
-import { motion, useInView, useAnimation, Variant } from "framer-motion";
+import { motion, useInView, useAnimation } from "framer-motion";
+import { useEffect, useRef } from "react";
+import { cn } from "@/lib/utils";
 
 interface RevealProps {
     children: React.ReactNode;
     width?: "fit-content" | "100%";
-    delay?: number;
-    duration?: number;
-    direction?: "up" | "down" | "left" | "right";
     className?: string;
+    delay?: number;
+    direction?: "up" | "down" | "left" | "right";
+    hideSlide?: boolean;
 }
 
 export const Reveal = ({
     children,
     width = "fit-content",
-    delay = 0.25,
-    duration = 0.5,
-    direction = "up",
     className,
+    delay = 0.2,
+    direction = "up",
+    hideSlide = false
 }: RevealProps) => {
     const ref = useRef(null);
     const isInView = useInView(ref, { once: true, margin: "-100px" });
@@ -30,29 +30,51 @@ export const Reveal = ({
         }
     }, [isInView, mainControls]);
 
-    const variants = {
-        hidden: {
-            opacity: 0,
-            y: direction === "up" ? 40 : direction === "down" ? -40 : 0,
-            x: direction === "left" ? -40 : direction === "right" ? 40 : 0
-        },
-        visible: {
-            opacity: 1,
-            y: 0,
-            x: 0
+    const getDirectionalVariants = () => {
+        switch (direction) {
+            case "up": return { hidden: { opacity: 0, y: 75, filter: "blur(10px)" }, visible: { opacity: 1, y: 0, filter: "blur(0px)" } };
+            case "down": return { hidden: { opacity: 0, y: -75, filter: "blur(10px)" }, visible: { opacity: 1, y: 0, filter: "blur(0px)" } };
+            case "left": return { hidden: { opacity: 0, x: 75, filter: "blur(10px)" }, visible: { opacity: 1, x: 0, filter: "blur(0px)" } };
+            case "right": return { hidden: { opacity: 0, x: -75, filter: "blur(10px)" }, visible: { opacity: 1, x: 0, filter: "blur(0px)" } };
+            default: return { hidden: { opacity: 0, y: 75, filter: "blur(10px)" }, visible: { opacity: 1, y: 0, filter: "blur(0px)" } };
         }
     };
 
     return (
-        <div ref={ref} style={{ position: "relative", width }} className={className}>
+        <div ref={ref} style={{ position: "relative", width, overflow: "visible" }} className={className}>
             <motion.div
-                variants={variants}
+                variants={getDirectionalVariants()}
                 initial="hidden"
                 animate={mainControls}
-                transition={{ duration, delay, ease: "easeOut" }}
+                transition={{ duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }}
             >
                 {children}
             </motion.div>
+
+            {!hideSlide && (
+                <motion.div
+                    variants={{
+                        hidden: { left: 0 },
+                        visible: { left: "100%" },
+                    }}
+                    initial="hidden"
+                    animate={mainControls}
+                    transition={{ duration: 0.5, ease: "easeIn", delay }}
+                    style={{
+                        position: "absolute",
+                        top: 4,
+                        bottom: 4,
+                        left: 0,
+                        right: 0,
+                        background: "hsl(var(--primary))",
+                        zIndex: 20,
+                        borderRadius: "4px",
+                        opacity: 0.8,
+                        backdropFilter: "blur(4px)",
+                        WebkitBackdropFilter: "blur(4px)",
+                    }}
+                />
+            )}
         </div>
     );
 };

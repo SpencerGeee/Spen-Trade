@@ -54,7 +54,7 @@ export default function TestimonialsSection() {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.1 }}
-                        className="font-serif text-3xl md:text-5xl font-bold"
+                        className="font-montserrat text-3xl md:text-5xl font-bold"
                     >
                         Loved by{" "}
                         <span className="text-gradient-gold">Thousands</span>

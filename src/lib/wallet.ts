@@ -8,34 +8,44 @@ export class WalletService {
      * Generates a new EVM-compatible private key and address.
      * In a production environment, private keys should be encrypted at rest (e.g., using AWS KMS or Vault).
      */
-    static async getOrCreateWallet(userId: string) {
+    static async getOrCreateWallet(clerkId: string) {
         try {
-            const existingWallet = await prisma.wallet.findUnique({
-                where: { userId },
+            // 1. Ensure User exists in Prisma (Atomic Upsert)
+            const user = await prisma.user.upsert({
+                where: { clerkId },
+                update: {}, // No-op if exists
+                create: {
+                    clerkId,
+                    email: `${clerkId}@temporary.spen`,
+                    username: `trader_${clerkId.slice(-6)}`,
+                },
+                include: { wallet: true }
             });
 
-            if (existingWallet) {
-                return existingWallet;
+            if (user.wallet) {
+                return user.wallet;
             }
 
-            // Generate new account
+            // 2. Generate new account
             const privateKey = generatePrivateKey();
             const account = privateKeyToAccount(privateKey);
 
-            const wallet = await prisma.wallet.create({
-                data: {
-                    userId,
+            const wallet = await prisma.wallet.upsert({
+                where: { userId: user.id },
+                update: {}, // Return existing if found
+                create: {
+                    userId: user.id,
                     address: account.address,
-                    privateKey: privateKey, // WARNING: Store encrypted in production
+                    privateKey: privateKey,
                     balance: 0,
                     currency: "USD",
                 },
             });
 
-            logger.info(`[WALLET] Created new wallet for user ${userId}: ${account.address}`);
+            logger.info(`[WALLET] Created new wallet for user ${user.id}: ${account.address}`);
             return wallet;
         } catch (error) {
-            logger.error({ error }, `[WALLET_CREATE_ERROR] User ID: ${userId}`);
+            logger.error({ error }, `[WALLET_CREATE_ERROR] Clerk ID: ${clerkId}`);
             throw error;
         }
     }

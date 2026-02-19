@@ -49,17 +49,17 @@ export function LoginForm() {
     return (
         <div className="grid gap-6">
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                     <FormField
                         control={form.control}
                         name="email"
                         render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Email</FormLabel>
+                            <FormItem className="space-y-2">
+                                <FormLabel className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60 ml-1">Digital Address</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="name@example.com" {...field} />
+                                    <Input placeholder="name@infrastructure.com" className="h-14 rounded-2xl glass border-white/10 focus:border-primary/50 transition-all px-6" {...field} />
                                 </FormControl>
-                                <FormMessage />
+                                <FormMessage className="text-[10px] uppercase font-bold tracking-widest" />
                             </FormItem>
                         )}
                     />
@@ -67,66 +67,65 @@ export function LoginForm() {
                         control={form.control}
                         name="password"
                         render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Password</FormLabel>
+                            <FormItem className="space-y-2">
+                                <FormLabel className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60 ml-1">Security Key</FormLabel>
                                 <FormControl>
-                                    <Input type="password" placeholder="••••••••" {...field} />
+                                    <Input type="password" placeholder="••••••••" className="h-14 rounded-2xl glass border-white/10 focus:border-primary/50 transition-all px-6" {...field} />
                                 </FormControl>
-                                <FormMessage />
+                                <FormMessage className="text-[10px] uppercase font-bold tracking-widest" />
                             </FormItem>
                         )}
                     />
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between px-1">
                         <FormField
                             control={form.control}
                             name="rememberMe"
                             render={({ field }) => (
-                                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                                <FormItem className="flex flex-row items-center space-x-3 space-y-0">
                                     <FormControl>
                                         <Checkbox
                                             checked={field.value}
                                             onCheckedChange={field.onChange}
+                                            className="rounded-md border-white/20 bg-white/5"
                                         />
                                     </FormControl>
-                                    <div className="space-y-1 leading-none">
-                                        <FormLabel>Remember me</FormLabel>
-                                    </div>
+                                    <FormLabel className="text-[10px] font-bold uppercase tracking-widest opacity-60">Persistent Session</FormLabel>
                                 </FormItem>
                             )}
                         />
                         <Link
                             href="/forgot-password"
-                            className="text-sm font-medium text-primary hover:underline"
+                            className="text-[10px] font-black uppercase tracking-widest text-primary hover:text-primary/80 transition-colors"
                         >
-                            Forgot password?
+                            Recover Access
                         </Link>
                     </div>
-                    <Button type="submit" className="w-full" disabled={isLoading} variant="gold">
-                        {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Sign In with Email
+                    <Button type="submit" className="w-full h-14 rounded-2xl text-xs font-black uppercase tracking-[0.2em] shadow-xl shadow-primary/20" disabled={isLoading} variant="gold">
+                        {isLoading && <Loader2 className="mr-3 h-4 w-4 animate-spin" />}
+                        Authorize Connection
                     </Button>
                 </form>
             </Form>
-            <div className="relative">
+            <div className="relative py-4">
                 <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t" />
+                    <span className="w-full border-t border-white/5" />
                 </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-background px-2 text-muted-foreground">
-                        Or continue with
+                <div className="relative flex justify-center text-[10px] font-black uppercase tracking-[0.3em]">
+                    <span className="bg-background px-4 text-muted-foreground/40">
+                        Alternative Protocol
                     </span>
                 </div>
             </div>
-            <Button variant="outline" type="button" disabled={isLoading}>
-                Google
+            <Button variant="outline" type="button" disabled={isLoading} className="h-14 rounded-2xl border-white/10 glass text-[10px] font-black uppercase tracking-[0.2em] hover:bg-white/5">
+                Authenticate with Google
             </Button>
-            <p className="px-8 text-center text-sm text-muted-foreground">
-                Don&apos;t have an account?{" "}
+            <p className="px-8 text-center text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 leading-relaxed">
+                New to the infrastructure?{" "}
                 <Link
                     href="/register"
-                    className="underline underline-offset-4 hover:text-primary"
+                    className="text-primary hover:text-primary/80 transition-colors underline-offset-4 underline"
                 >
-                    Sign Up
+                    Create Identity
                 </Link>
             </p>
         </div>

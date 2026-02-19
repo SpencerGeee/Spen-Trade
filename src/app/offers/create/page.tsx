@@ -87,7 +87,7 @@ export default function CreateOfferPage() {
     return (
         <div className="container mx-auto py-12 px-4">
             <div className="mb-12 text-center space-y-4">
-                <h1 className="text-4xl font-bold font-serif text-primary">Create an Offer</h1>
+                <h1 className="text-4xl font-bold font-montserrat text-primary">Create an Offer</h1>
                 <p className="text-muted-foreground max-w-2xl mx-auto">
                     Set your trading terms and let buyers or sellers come to you.
                 </p>
